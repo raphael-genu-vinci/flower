@@ -3,7 +3,9 @@ const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const { urlencoded } = require('body-parser');
 const readline = require('readline');
+const auth = require('./auth');
 
 // Color for the log
 const RESET = "\x1b[0m";
@@ -19,9 +21,10 @@ const rl = readline.createInterface({
 });
 
 const app = express();
-app.use(cors());
 // Middleware
 const port = process.env.PORT || 8081;
+app.use(express.json());
+app.use(urlencoded({ extended: true }));
 
 const sqlFilePath = './data/db_install.sql';
 
@@ -73,13 +76,27 @@ const db = new sqlite3.Database('./data/mydatabase.db', (err) => {
         });
     }
 })
+app.use(cors());
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    );
+    next();
+  });
+
 
 app.get('/', (req, res) => {
         const ascii =`
 
             ⢀⣀⣀⣀⣤⣤⣤⣤⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⣠⣴⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣦⣄⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠙⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠋⠀⠀⠀⠀⠀
+      ⣠⣴⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣦⣄⠀⠀⠀⠀⠀
+      ⠙⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠋⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⣿⣶⣤⣄⣉⣉⠙⠛⠛⠛⠛⠛⠛⠋⣉⣉⣠⣤⣶⣿⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⠀⠀⠀⠀
@@ -99,7 +116,23 @@ app.get('/', (req, res) => {
 
 const userRouter = require("./routes/user")
 const commentRouter = require("./routes/comment")
-const shopRouter = require("./routes/shop")
+const shopRouter = require("./routes/shop");
+const { url } = require('inspector');
+
+app.use("/user", userRouter)
+app.use("/comment", commentRouter)
+app.use("/shop", shopRouter)
+
+// free endpoint
+app.get("/free-endpoint", (request, response) => {
+    response.json({ message: "You are free to access me anytime" });
+  });
+  
+  // authentication endpoint
+  app.get("/auth-endpoint", auth, (request, response) => {
+    response.json({ message: "You are authorized to access me" });
+  });
+  
 
 // Start server
 app.listen(port, () => {

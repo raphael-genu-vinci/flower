@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS users;
 -- Creating users table
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
+    name VARCHAR(20) NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL
 );
