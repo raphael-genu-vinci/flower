@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Lobster&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
+:root{
+  --general : #344E41;
+  --underline: #6D9886;
+  --bg : #f1ffef6d;
+  --hover : #A8CABA;
+  --nunito : "Nunito", sans-serif;
+  --lobster : "Lobster", cursive;
+  --card : #f7f6f6;
+}
+
+/* Flip the card */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.perspective {
+  perspective: 1000px;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+@layer base{
+  html,body{
+    @apply font-[Nunito];
+    height: 100%;
+  }
+  nav {
+    @apply text-[#2F3E46]
+  }
+}
